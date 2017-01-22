@@ -19,7 +19,7 @@ ball = pygame.image.load("ball.gif")
 ballrect = ball.get_rect()
 
 # Initialise RPC
-server = xmlrpc.client.ServerProxy("http://localhost:8000")
+server = xmlrpc.client.ServerProxy("http://192.168.1.103:8000")
 
 # Event loop
 speed = [0,0]
@@ -41,9 +41,10 @@ while 1:
   screen.fill(black)
   screen.blit(ball, ballrect)
   pygame.display.flip()
-  clock.tick(60)
-  if i % 20 == 0:
-    # Move the robot
+  if i % 60 == 0:
+    print("sending move command: "+str(speed))
     server.move_robot(speed[0], speed[1])
+    print("sent move command: "+str(speed))
+  clock.tick(60)
 
   i += 1
