@@ -1,13 +1,12 @@
 import sys, pygame
+import xmlrpc.client
 from pygame.locals import *
+
+# Initialise pygame
 pygame.init()
-
 size = width, height = 1000, 800
-# speed = [1, 1]
 black = 0, 0, 0
-
 clock = pygame.time.Clock()
-
 pygame.joystick.init()
 joysticks = [pygame.joystick.Joystick(x) for x in range(pygame.joystick.get_count())]
 print(str(len(joysticks)) + " joysticks detected.")
@@ -15,15 +14,17 @@ for joystick in joysticks:
   joystick.init()
   name = joystick.get_name()
   print("Joystick found: " + name)
-
 screen = pygame.display.set_mode(size)
-
 ball = pygame.image.load("ball.gif")
 ballrect = ball.get_rect()
 
-speed = [0,0]
+# Initialise RPC
+server = xmlrpc.client.ServerProxy("http://localhost:8000")
 
+# Event loop
+speed = [0,0]
 while 1:
+  i = 0
   for event in pygame.event.get():
       if event.type == QUIT:
         sys.exit()
@@ -36,12 +37,13 @@ while 1:
 
 
   ballrect = ballrect.move(speed)
-  # if ballrect.left < 0 or ballrect.right > width:
-  #     speed[0] = -speed[0]
-  # if ballrect.top < 0 or ballrect.bottom > height:
-  #     speed[1] = -speed[1]
 
   screen.fill(black)
   screen.blit(ball, ballrect)
   pygame.display.flip()
   clock.tick(60)
+  if i % 20 == 0:
+    # Move the robot
+    server.move_robot(speed[0], speed[1])
+
+  i += 1
